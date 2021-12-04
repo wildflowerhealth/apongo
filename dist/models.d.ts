@@ -1,4 +1,3 @@
-import { GraphQLObjectType, GraphQLSchema } from "graphql";
 export interface ILookup {
     collection: string;
     localField: string;
@@ -20,19 +19,6 @@ export interface IField {
             [key: string]: IField;
         };
     };
-}
-export interface IResolverInfo {
-    variableValues: {
-        [key: string]: any;
-    };
-    schema: GraphQLSchema;
-    fragments: {
-        [key: string]: any;
-    };
-    fieldNodes: IAbstractSyntaxTree[];
-    fieldASTs: IAbstractSyntaxTree[];
-    parentType: GraphQLObjectType;
-    returnType: undefined;
 }
 export interface IArgument {
     name: {

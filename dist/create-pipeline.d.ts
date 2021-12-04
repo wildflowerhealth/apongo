@@ -1,2 +1,2 @@
-import { IResolverInfo } from './models';
-export declare function createPipeline(mainField: string, resolveInfo: IResolverInfo, context: {}): {}[];
+import { GraphQLResolveInfo } from 'graphql';
+export declare function createPipeline(mainField: string, resolveInfo: GraphQLResolveInfo, context: {}): {}[];

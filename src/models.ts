@@ -1,29 +1,36 @@
-import { GraphQLObjectType, GraphQLSchema } from "graphql";
+export interface IApongo {
+    lookup?: IApongoLookup;
+    compose?: string[];
+    expr?: string;
+}
 
-export interface ILookup {
+export interface IApongoLookup {
     collection: string;
     localField: string;
     foreignField: string;
-    preserveNull: string;
-    conds: string;
-    sort: string;
-    limit: string;
+    preserveNull?: boolean;
+    conds?: string;
+    sort?: string;
+    limit?: number;
+}
+
+export interface ITreeNode {
+    name?: string;
+    alias?: string;
+    args?: { [arg: string]: any };
+    apongo?: IApongo;
+    fieldsByTypeName?: ITreeNode;
+    types: {
+        [typeName: string]: {
+            fields: { [fieldName: string]: ITreeNode };
+        };
+    };
 }
 
 export interface IField {
     alias: string;
-    apongo?: { lookup?: ILookup; compose?: string[]; expr?: string };
-    fieldsByTypeName: { [key: string]: { [key: string]: IField; } };
-}
-
-export interface IResolverInfo {
-    variableValues: { [key: string]: any };
-    schema: GraphQLSchema;
-    fragments: { [key: string]: any };
-    fieldNodes: IAbstractSyntaxTree[];
-    fieldASTs: IAbstractSyntaxTree[];
-    parentType: GraphQLObjectType;
-    returnType: undefined;
+    apongo?: IApongo;
+    fieldsByTypeName: { [key: string]: { [key: string]: IField } };
 }
 
 export interface IArgument {
@@ -35,20 +42,4 @@ export interface IArgument {
 export interface ITypeCondition {
     name: { value: string };
     kind: 'NamedType';
-}
-
-export interface IDirective {
-    name: { value: string };
-    arguments: IArgument[];
-}
-
-export interface IAbstractSyntaxTree {
-    name: { value: string };
-    alias: { value: string };
-    kind: 'Field';
-    directives: IDirective[];
-    selectionSet: {
-        selections: IAbstractSyntaxTree[];
-    };
-    typeCondition: ITypeCondition;
 }

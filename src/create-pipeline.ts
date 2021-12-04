@@ -1,5 +1,7 @@
 import { ApolloError } from 'apollo-server-core';
-import { IField, IResolverInfo } from './models';
+import { GraphQLResolveInfo } from 'graphql';
+import { ITreeNode } from '.';
+import { IField } from './models';
 
 import {
     parseResolveInfo,
@@ -109,11 +111,11 @@ function fillPipeline(fields: { [key: string]: IField }, pipeline: Array<{  }>, 
     });
 }
 
-export function createPipeline(mainField: string, resolveInfo: IResolverInfo, context: {}) {
+export function createPipeline(mainField: string, resolveInfo: GraphQLResolveInfo, context: {}) {
     const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
 
     let { fields } = simplifyParsedResolveInfoFragmentWithType(
-        parsedResolveInfoFragment,
+        parsedResolveInfoFragment as ITreeNode,
         resolveInfo.returnType,
     );
 

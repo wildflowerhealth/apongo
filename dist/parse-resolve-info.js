@@ -134,7 +134,9 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree = {}, options = {}, pare
     }, initTree);
 }
 function parseResolveInfo(resolveInfo, options = {}) {
-    const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs;
+    const fieldNodes = resolveInfo.fieldNodes ||
+        // is this needed 🤨
+        resolveInfo.fieldASTs;
     const { parentType } = resolveInfo;
     if (!fieldNodes) {
         throw new Error('No fieldNodes provided!');
