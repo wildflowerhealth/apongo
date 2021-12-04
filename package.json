@@ -2,7 +2,7 @@
   "name": "apongo",
   "version": "3.0.0",
   "description": "Create Mongo aggregation pipelines with recursive joins for Apollo queries.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "keywords": [
     "mongo",
     "apollo",
@@ -19,9 +19,9 @@
     "test": "jest --watch"
   },
   "peerDependencies": {
+    "@graphql-tools/utils": "^8.1.1",
     "apollo-server-core": "^3.0.2",
     "graphql": "^15.1.0",
-    "@graphql-tools/utils": "^8.1.1",
     "graphql-tag": "^2.9.2"
   },
   "devDependencies": {
@@ -37,6 +37,7 @@
     "merge-graphql-schemas": "^1.7.8",
     "mongo-unit": "^1.5.1",
     "mongodb-prebuilt": "^6.5.0",
-    "mongoose": "^5.13.7"
+    "mongoose": "^5.13.7",
+    "typescript": "^4.5.2"
   }
 }
