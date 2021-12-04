@@ -10,10 +10,10 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.apongoDirective = exports.createPipeline = void 0;
+exports.Apongo = exports.createPipeline = void 0;
 __exportStar(require("./models"), exports);
 var create_pipeline_1 = require("./create-pipeline");
 Object.defineProperty(exports, "createPipeline", { enumerable: true, get: function () { return create_pipeline_1.createPipeline; } });
-var types_1 = require("./types");
-Object.defineProperty(exports, "apongoDirective", { enumerable: true, get: function () { return types_1.apongoDirective; } });
+var decorator_1 = require("./decorator");
+Object.defineProperty(exports, "Apongo", { enumerable: true, get: function () { return decorator_1.Apongo; } });
 //# sourceMappingURL=index.js.map

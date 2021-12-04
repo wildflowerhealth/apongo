@@ -1,19 +1,36 @@
-export interface ILookup {
+export interface IApongo {
+    lookup?: IApongoLookup;
+    compose?: string[];
+    expr?: string;
+}
+export interface IApongoLookup {
     collection: string;
     localField: string;
     foreignField: string;
-    preserveNull: string;
-    conds: string;
-    sort: string;
-    limit: string;
+    preserveNull?: boolean;
+    conds?: string;
+    sort?: string;
+    limit?: number;
+}
+export interface ITreeNode {
+    name?: string;
+    alias?: string;
+    args?: {
+        [arg: string]: any;
+    };
+    apongo?: IApongo;
+    fieldsByTypeName?: ITreeNode;
+    types: {
+        [typeName: string]: {
+            fields: {
+                [fieldName: string]: ITreeNode;
+            };
+        };
+    };
 }
 export interface IField {
     alias: string;
-    apongo?: {
-        lookup?: ILookup;
-        compose?: string[];
-        expr?: string;
-    };
+    apongo?: IApongo;
     fieldsByTypeName: {
         [key: string]: {
             [key: string]: IField;
@@ -32,24 +49,4 @@ export interface ITypeCondition {
         value: string;
     };
     kind: 'NamedType';
-}
-export interface IDirective {
-    name: {
-        value: string;
-    };
-    arguments: IArgument[];
-}
-export interface IAbstractSyntaxTree {
-    name: {
-        value: string;
-    };
-    alias: {
-        value: string;
-    };
-    kind: 'Field';
-    directives: IDirective[];
-    selectionSet: {
-        selections: IAbstractSyntaxTree[];
-    };
-    typeCondition: ITypeCondition;
 }

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.simplifyParsedResolveInfoFragmentWithType = exports.parseResolveInfo = void 0;
 const graphql_1 = require("graphql");
-const { getArgumentValues } = require('graphql/execution/values');
+const values_1 = require("graphql/execution/values");
 function getArgVal(resolveInfo, argument) {
     if (argument.kind === 'Variable') {
         return resolveInfo.variableValues[argument.name.value];
@@ -29,9 +29,9 @@ function getType(resolveInfo, typeCondition) {
     }
     return null;
 }
-function skipField(resolveInfo, { directives = [] }) {
+function skipField(resolveInfo, { directives }) {
     let skip = false;
-    directives.forEach(directive => {
+    (directives !== null && directives !== void 0 ? directives : []).forEach(directive => {
         const directiveName = directive.name.value;
         if (Array.isArray(directive.arguments)) {
             const ifArgumentAst = directive.arguments.find(arg => arg.name && arg.name.value === 'if');
@@ -60,11 +60,11 @@ function getFieldFromAST(ast, parentType) {
     }
     return undefined;
 }
-function fieldTreeFromAST(inASTs, resolveInfo, initTree = {}, options = {}, parentType) {
+function fieldTreeFromAST(inASTs, resolveInfo, initTree = { types: {} }, options = {}, parentType) {
     const { variableValues } = resolveInfo;
     const fragments = resolveInfo.fragments || {};
     const asts = Array.isArray(inASTs) ? inASTs : [inASTs];
-    initTree[parentType.name] = initTree[parentType.name] || {};
+    initTree.types[parentType.name] = initTree.types[parentType.name] || {};
     return asts.reduce((tree, selectionVal) => {
         var _a;
         if (!skipField(resolveInfo, selectionVal)) {
@@ -83,24 +83,25 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree = {}, options = {}, pare
                         return tree;
                     }
                     const fieldGqlType = fieldGqlTypeOrUndefined;
-                    const args = getArgumentValues(field, val, variableValues) || {};
-                    if (parentType.name && !tree[parentType.name][alias]) {
-                        const apongo = Object.assign({}, (((_a = field.astNode) === null || _a === void 0 ? void 0 : _a.apongo) || {}));
+                    const args = (0, values_1.getArgumentValues)(field, val, variableValues) || {};
+                    if (parentType.name && !tree.types[parentType.name].fields[alias]) {
+                        const { apongo } = (_a = parentType.getFields()[field.name].extensions) !== null && _a !== void 0 ? _a : {};
                         const newTreeRoot = {
                             name,
                             alias,
                             args,
                             apongo,
                             fieldsByTypeName: (0, graphql_1.isCompositeType)(fieldGqlType)
-                                ? { [fieldGqlType.name]: {} }
-                                : {},
+                                ? { types: { [fieldGqlType.name]: { fields: {} } } }
+                                : { types: {} },
+                            types: {},
                         };
-                        tree[parentType.name][alias] = newTreeRoot;
+                        tree.types[parentType.name].fields[alias] = newTreeRoot;
                     }
                     const { selectionSet } = val;
                     if (selectionSet != null && options.deep && (0, graphql_1.isCompositeType)(fieldGqlType)) {
                         const newParentType = fieldGqlType;
-                        fieldTreeFromAST(selectionSet.selections, resolveInfo, tree[parentType.name][alias].fieldsByTypeName, options, newParentType);
+                        fieldTreeFromAST(selectionSet.selections, resolveInfo, tree.types[parentType.name].fields[alias].fieldsByTypeName, options, newParentType);
                     }
                 }
             }
@@ -153,7 +154,7 @@ function parseResolveInfo(resolveInfo, options = {}) {
         if (!typeKey) {
             return null;
         }
-        const fields = tree[typeKey];
+        const fields = tree.types[typeKey].fields;
         const fieldKey = firstKey(fields);
         if (!fieldKey) {
             return null;
@@ -168,12 +169,12 @@ function simplifyParsedResolveInfoFragmentWithType(parsedResolveInfoFragment, ty
     const fields = {};
     const strippedType = (0, graphql_1.getNamedType)(type);
     if ((0, graphql_1.isCompositeType)(strippedType)) {
-        Object.assign(fields, fieldsByTypeName[strippedType.name]);
+        Object.assign(fields, fieldsByTypeName === null || fieldsByTypeName === void 0 ? void 0 : fieldsByTypeName.types[strippedType.name]);
         if (strippedType instanceof graphql_1.GraphQLObjectType) {
             const objectType = strippedType;
             // GraphQL ensures that the subfields cannot clash, so it's safe to simply overwrite them
             objectType.getInterfaces().forEach(anInterface => {
-                Object.assign(fields, fieldsByTypeName[anInterface.name]);
+                Object.assign(fields, fieldsByTypeName === null || fieldsByTypeName === void 0 ? void 0 : fieldsByTypeName.types[anInterface.name]);
             });
         }
     }
