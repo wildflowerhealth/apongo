@@ -17,9 +17,10 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "version": "npm run build && git add dist",
+    "version": "npm run clean && npm run build && git add dist",
     "postversion": "git push && git push --tags",
     "pretty": "prettier -w .",
+    "clean": "rm -rf dist",
     "build": "tsc",
     "precommit": "npm run build && git add dist",
     "deploy": "npm publish",
