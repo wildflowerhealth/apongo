@@ -45,7 +45,7 @@ function fillPipeline(fields, pipeline, context, path = '') {
         }
         // `compose` concatenates the arguments passed in.
         // Auguments prefixed by $ are modified to include the ancestor path
-        if (apongo.compose) {
+        if (apongo.compose && apongo.compose.length > 0) {
             pipeline.push({
                 $addFields: {
                     [`${path}${alias}`]: {
