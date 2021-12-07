@@ -156,6 +156,7 @@ function parseResolveInfo(resolveInfo, options = {}) {
         if (!typeKey) {
             return null;
         }
+        console.log(JSON.stringify({ level: 40, tree, typeKey }));
         const fields = tree.types[typeKey].fields;
         const fieldKey = firstKey(fields);
         if (!fieldKey) {
