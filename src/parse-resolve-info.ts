@@ -231,12 +231,12 @@ export function simplifyParsedResolveInfoFragmentWithType(
     const fields = {} as { [key: string]: IField };
     const strippedType = getNamedType(type);
     if (isCompositeType(strippedType)) {
-        Object.assign(fields, fieldsByTypeName?.types[strippedType.name]);
+        Object.assign(fields, fieldsByTypeName?.[strippedType.name]);
         if (strippedType instanceof GraphQLObjectType) {
             const objectType = strippedType;
             // GraphQL ensures that the subfields cannot clash, so it's safe to simply overwrite them
             objectType.getInterfaces().forEach(anInterface => {
-                Object.assign(fields, fieldsByTypeName?.types[anInterface.name]);
+                Object.assign(fields, fieldsByTypeName?.[anInterface.name]);
             });
         }
     }
