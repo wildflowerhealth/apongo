@@ -60,12 +60,12 @@ function getFieldFromAST(ast, parentType) {
     }
     return undefined;
 }
-function fieldTreeFromAST(inASTs, resolveInfo, initTree = { types: {} }, options = {}, parentType) {
+function fieldTreeFromAST(inASTs, resolveInfo, initTree = {}, options = {}, parentType) {
     console.log(JSON.stringify({ level: 40, fieldTreeFromAST: parentType === null || parentType === void 0 ? void 0 : parentType.name }));
     const { variableValues } = resolveInfo;
     const fragments = resolveInfo.fragments || {};
     const asts = Array.isArray(inASTs) ? inASTs : [inASTs];
-    initTree.types[parentType.name] = initTree.types[parentType.name] || { fields: {} };
+    initTree[parentType.name] = initTree[parentType.name] || {};
     return asts.reduce((tree, selectionVal) => {
         var _a;
         if (!skipField(resolveInfo, selectionVal)) {
@@ -86,7 +86,7 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree = { types: {} }, options
                     const fieldGqlType = fieldGqlTypeOrUndefined;
                     const args = (0, values_1.getArgumentValues)(field, val, variableValues) || {};
                     // console.log(`field ${field.name} extensions`, parentType.getFields()[field.name].extensions)
-                    if (parentType.name && !tree.types[parentType.name].fields[alias]) {
+                    if (parentType.name && !tree[parentType.name][alias]) {
                         const { apongo } = (_a = parentType.getFields()[field.name].extensions) !== null && _a !== void 0 ? _a : {};
                         const newTreeRoot = {
                             name,
@@ -94,16 +94,15 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree = { types: {} }, options
                             args,
                             apongo,
                             fieldsByTypeName: (0, graphql_1.isCompositeType)(fieldGqlType)
-                                ? { types: { [fieldGqlType.name]: { fields: {} } } }
-                                : { types: {} },
-                            types: {},
+                                ? { [fieldGqlType.name]: {} }
+                                : {},
                         };
-                        tree.types[parentType.name].fields[alias] = newTreeRoot;
+                        tree[parentType.name][alias] = newTreeRoot;
                     }
                     const { selectionSet } = val;
                     if (selectionSet != null && options.deep && (0, graphql_1.isCompositeType)(fieldGqlType)) {
                         const newParentType = fieldGqlType;
-                        fieldTreeFromAST(selectionSet.selections, resolveInfo, tree.types[parentType.name].fields[alias].fieldsByTypeName, options, newParentType);
+                        fieldTreeFromAST(selectionSet.selections, resolveInfo, tree[parentType.name][alias].fieldsByTypeName, options, newParentType);
                     }
                 }
             }
@@ -157,7 +156,7 @@ function parseResolveInfo(resolveInfo, options = {}) {
             return null;
         }
         console.log(JSON.stringify({ level: 40, tree, typeKey }));
-        const fields = tree.types[typeKey].fields;
+        const fields = tree[typeKey];
         const fieldKey = firstKey(fields);
         if (!fieldKey) {
             return null;

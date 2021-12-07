@@ -19,13 +19,11 @@ export interface ITreeNode {
         [arg: string]: any;
     };
     apongo?: IApongo;
-    fieldsByTypeName?: ITreeNode;
-    types: {
-        [typeName: string]: {
-            fields: {
-                [fieldName: string]: ITreeNode;
-            };
-        };
+    fieldsByTypeName?: ITreeTypes;
+}
+export interface ITreeTypes {
+    [typeName: string]: {
+        [fieldName: string]: ITreeNode;
     };
 }
 export interface IField {

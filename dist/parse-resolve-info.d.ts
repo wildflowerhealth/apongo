@@ -1,9 +1,10 @@
 import { GraphQLOutputType, GraphQLResolveInfo } from 'graphql';
+import { ITreeTypes } from '.';
 import { IField, ITreeNode } from './models';
 export declare function parseResolveInfo(resolveInfo: GraphQLResolveInfo, options?: {
     deep?: boolean;
     keepRoot?: boolean;
-}): ITreeNode | null;
+}): ITreeNode | ITreeTypes | null;
 export declare function simplifyParsedResolveInfoFragmentWithType(parsedResolveInfoFragment: ITreeNode, type: GraphQLOutputType): {
     fields: {
         [key: string]: IField;
@@ -14,12 +15,5 @@ export declare function simplifyParsedResolveInfoFragmentWithType(parsedResolveI
         [arg: string]: any;
     } | undefined;
     apongo?: import("./models").IApongo | undefined;
-    fieldsByTypeName?: ITreeNode | undefined;
-    types: {
-        [typeName: string]: {
-            fields: {
-                [fieldName: string]: ITreeNode;
-            };
-        };
-    };
+    fieldsByTypeName?: ITreeTypes | undefined;
 };
