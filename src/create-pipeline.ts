@@ -48,7 +48,7 @@ function fillPipeline(fields: { [key: string]: IField }, pipeline: Array<{  }>, 
                 };
             }
 
-            const preserveNullAndEmptyArrays = preserveNull !== undefined ? preserveNull : true;
+            const preserveNullAndEmptyArrays = preserveNull !== undefined ? preserveNull : false;
 
             pipeline.push({ $lookup: { ...lookup, as: `${path}${alias}` } });
             pipeline.push({ $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } });
