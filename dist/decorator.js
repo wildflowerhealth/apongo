@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Apongo = void 0;
 const type_graphql_1 = require("type-graphql");
-/** add apongo metadata to an entity */
 function Apongo(lookup, compose = [], expr) {
     // factory returns the actual decoration function.
     return function (target, propertyKey, descriptor) {
