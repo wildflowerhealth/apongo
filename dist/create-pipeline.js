@@ -39,7 +39,7 @@ function fillPipeline(fields, pipeline, context, path = '') {
                     ],
                 };
             }
-            const preserveNullAndEmptyArrays = preserveNull !== undefined ? preserveNull : false;
+            const preserveNullAndEmptyArrays = preserveNull !== undefined ? preserveNull : true;
             pipeline.push({ $lookup: Object.assign(Object.assign({}, lookup), { as: `${path}${alias}` }) });
             pipeline.push({ $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } });
         }
@@ -78,17 +78,16 @@ function fillPipeline(fields, pipeline, context, path = '') {
             const subFields = field.fieldsByTypeName[fieldsByTypeNameKeys[0]];
             fillPipeline(subFields, pipeline, context, `${path}${alias}.`);
         }
-        // FIXME: figure out what this is supposed to do, and arrange for it, now it just borks the results
-        // // If the parent didn't exist at all before compose or expr was called then we'll end up with an empty object.
-        // // If that's the case then we remove it.
-        // if ((apongo.lookup || apongo.compose || apongo.expr) && path) {
-        //     const parent = path.slice(0, -1);
-        //     pipeline.push({
-        //         $addFields: {
-        //             [parent]: { $cond: [{ $ne: [`$${parent}`, {}] }, `$${parent}`, '$$REMOVE'] },
-        //         },
-        //     });
-        // }
+        // If the parent didn't exist at all before compose or expr was called then we'll end up with an empty object.
+        // If that's the case then we remove it.
+        if ((apongo.lookup || apongo.compose || apongo.expr) && path) {
+            const parent = path.slice(0, -1);
+            pipeline.push({
+                $project: {
+                    [parent]: { $cond: [{ $ne: [`$${parent}`, {}] }, `$${parent}`, '$$REMOVE'] },
+                },
+            });
+        }
     });
 }
 function createPipeline(mainField, resolveInfo, context) {
