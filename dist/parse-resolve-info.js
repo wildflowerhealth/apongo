@@ -85,8 +85,8 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree = {}, options = {}, pare
                     }
                     const fieldGqlType = fieldGqlTypeOrUndefined;
                     const args = (0, values_1.getArgumentValues)(field, val, variableValues) || {};
-                    // console.log(`field ${field.name} extensions`, parentType.getFields()[field.name].extensions)
                     if (parentType.name && !tree[parentType.name][alias]) {
+                        console.log(`field ${field.name} extensions`, parentType.getFields()[field.name].extensions);
                         const { apongo } = (_a = parentType.getFields()[field.name].extensions) !== null && _a !== void 0 ? _a : {};
                         const newTreeRoot = {
                             name,
