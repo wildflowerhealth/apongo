@@ -1,12 +1,8 @@
-import {
-    FieldNode,
-    GraphQLOutputType,
-    GraphQLResolveInfo,
-    SelectionNode,
-} from 'graphql';
+import { FieldNode, GraphQLOutputType, GraphQLResolveInfo, SelectionNode } from 'graphql';
 
 import { getNamedType, isCompositeType, GraphQLObjectType, GraphQLUnionType } from 'graphql';
 import { getArgumentValues } from 'graphql/execution/values';
+import { ITreeTypes } from '.';
 import { IArgument, IField, ITreeNode, ITypeCondition } from './models';
 
 function getArgVal(resolveInfo: GraphQLResolveInfo, argument: IArgument) {
@@ -78,7 +74,7 @@ function getFieldFromAST(ast: FieldNode, parentType: GraphQLObjectType) {
 function fieldTreeFromAST(
     inASTs: readonly SelectionNode[],
     resolveInfo: GraphQLResolveInfo,
-    initTree: ITreeNode = { types: {} },
+    initTree: ITreeTypes = {},
     options: { deep?: boolean } = {},
     parentType: GraphQLObjectType,
 ) {
@@ -87,7 +83,7 @@ function fieldTreeFromAST(
     const fragments = resolveInfo.fragments || {};
     const asts: readonly SelectionNode[] = Array.isArray(inASTs) ? inASTs : [inASTs];
 
-    initTree.types[parentType.name] = initTree.types[parentType.name] || { fields: {} };
+    initTree[parentType.name] = initTree[parentType.name] || {};
 
     return asts.reduce((tree, selectionVal) => {
         if (!skipField(resolveInfo, selectionVal)) {
@@ -109,7 +105,7 @@ function fieldTreeFromAST(
                     const fieldGqlType = fieldGqlTypeOrUndefined;
                     const args = getArgumentValues(field, val, variableValues) || {};
                     // console.log(`field ${field.name} extensions`, parentType.getFields()[field.name].extensions)
-                    if (parentType.name && !tree.types[parentType.name].fields[alias]) {
+                    if (parentType.name && !tree[parentType.name][alias]) {
                         const { apongo } = parentType.getFields()[field.name].extensions ?? {};
                         const newTreeRoot = {
                             name,
@@ -117,12 +113,11 @@ function fieldTreeFromAST(
                             args,
                             apongo,
                             fieldsByTypeName: isCompositeType(fieldGqlType)
-                                ? { types: { [fieldGqlType.name]: { fields: {} } } }
-                                : { types: {} },
-                            types: {},
+                                ? { [fieldGqlType.name]: {} }
+                                : {},
                         };
 
-                        tree.types[parentType.name].fields[alias] = newTreeRoot;
+                        tree[parentType.name][alias] = newTreeRoot;
                     }
 
                     const { selectionSet } = val;
@@ -131,7 +126,7 @@ function fieldTreeFromAST(
                         fieldTreeFromAST(
                             selectionSet.selections,
                             resolveInfo,
-                            tree.types[parentType.name].fields[alias].fieldsByTypeName,
+                            tree[parentType.name][alias].fieldsByTypeName,
                             options,
                             newParentType as GraphQLObjectType,
                         );
@@ -217,7 +212,7 @@ export function parseResolveInfo(
             return null;
         }
         console.log(JSON.stringify({ level: 40, tree, typeKey }));
-        const fields = tree.types[typeKey].fields;
+        const fields = tree[typeKey];
         const fieldKey = firstKey(fields);
         if (!fieldKey) {
             return null;
