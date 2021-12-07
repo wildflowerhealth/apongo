@@ -3,7 +3,8 @@ import { Extensions } from 'type-graphql';
 import { IApongoLookup } from './models';
 
 /** add apongo metadata to an entity */
-export function Apongo(lookup: IApongoLookup, compose: string[] = [], expr?: string): PropertyDecorator | MethodDecorator {
+export function Apongo(lookup: IApongoLookup, compose?: string[]): PropertyDecorator;
+export function Apongo(lookup: IApongoLookup, compose: string[] = [], expr?: string): MethodDecorator {
     // factory returns the actual decoration function.
     return function (target, propertyKey, descriptor): void {
         Extensions({
