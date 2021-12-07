@@ -3,15 +3,15 @@ import { Extensions } from 'type-graphql';
 import { IApongoLookup } from './models';
 
 /** add apongo metadata to an entity */
-export function Apongo(lookup: IApongoLookup, compose: string[] = [], expr?: string): Function {
+export function Apongo(lookup: IApongoLookup, compose: string[] = [], expr?: string) {
     // factory returns the actual decoration function.
-    return function (target: Function): void {
+    return function (target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<unknown>): void {
         Extensions({
             apongo: {
                 lookup,
                 compose,
                 expr,
             },
-        })(target);
+        })(target, propertyKey, descriptor);
     };
 }
