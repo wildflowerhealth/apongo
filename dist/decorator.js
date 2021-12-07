@@ -5,14 +5,14 @@ const type_graphql_1 = require("type-graphql");
 /** add apongo metadata to an entity */
 function Apongo(lookup, compose = [], expr) {
     // factory returns the actual decoration function.
-    return function (target) {
+    return function (target, propertyKey, descriptor) {
         (0, type_graphql_1.Extensions)({
             apongo: {
                 lookup,
                 compose,
                 expr,
             },
-        })(target);
+        })(target, propertyKey, descriptor);
     };
 }
 exports.Apongo = Apongo;
