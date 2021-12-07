@@ -98,16 +98,17 @@ function fillPipeline(fields: { [key: string]: IField }, pipeline: Array<{  }>, 
             fillPipeline(subFields, pipeline, context, `${path}${alias}.`);
         }
 
-        // If the parent didn't exist at all before compose or expr was called then we'll end up with an empty object.
-        // If that's the case then we remove it.
-        if ((apongo.lookup || apongo.compose || apongo.expr) && path) {
-            const parent = path.slice(0, -1);
-            pipeline.push({
-                $addFields: {
-                    [parent]: { $cond: [{ $ne: [`$${parent}`, {}] }, `$${parent}`, '$$REMOVE'] },
-                },
-            });
-        }
+        // FIXME: figure out what this is supposed to do, and arrange for it, now it just borks the results
+        // // If the parent didn't exist at all before compose or expr was called then we'll end up with an empty object.
+        // // If that's the case then we remove it.
+        // if ((apongo.lookup || apongo.compose || apongo.expr) && path) {
+        //     const parent = path.slice(0, -1);
+        //     pipeline.push({
+        //         $addFields: {
+        //             [parent]: { $cond: [{ $ne: [`$${parent}`, {}] }, `$${parent}`, '$$REMOVE'] },
+        //         },
+        //     });
+        // }
     });
 }
 
