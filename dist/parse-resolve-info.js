@@ -65,7 +65,7 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree = { types: {} }, options
     const { variableValues } = resolveInfo;
     const fragments = resolveInfo.fragments || {};
     const asts = Array.isArray(inASTs) ? inASTs : [inASTs];
-    initTree.types[parentType.name] = initTree.types[parentType.name] || {};
+    initTree.types[parentType.name] = initTree.types[parentType.name] || { fields: {} };
     return asts.reduce((tree, selectionVal) => {
         var _a;
         if (!skipField(resolveInfo, selectionVal)) {
