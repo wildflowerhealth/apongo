@@ -22,6 +22,7 @@
     "pretty": "prettier -w .",
     "clean": "rm -rf dist",
     "build": "tsc",
+    "watch": "tsc --watch --preserveWatchOutput",
     "precommit": "npm run build && git add dist",
     "deploy": "npm publish",
     "test": "jest",

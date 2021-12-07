@@ -78,7 +78,6 @@ function fieldTreeFromAST(
     options: { deep?: boolean } = {},
     parentType: GraphQLObjectType,
 ) {
-    console.log(JSON.stringify({ level: 40, fieldTreeFromAST: parentType?.name }));
     const { variableValues } = resolveInfo;
     const fragments = resolveInfo.fragments || {};
     const asts: readonly SelectionNode[] = Array.isArray(inASTs) ? inASTs : [inASTs];
@@ -105,7 +104,6 @@ function fieldTreeFromAST(
                     const fieldGqlType = fieldGqlTypeOrUndefined;
                     const args = getArgumentValues(field, val, variableValues) || {};
                     if (parentType.name && !tree[parentType.name][alias]) {
-                        console.log(`field ${field.name} extensions`, parentType.getFields()[field.name].extensions)
                         const { apongo } = parentType.getFields()[field.name].extensions ?? {};
                         const newTreeRoot = {
                             name,
@@ -211,7 +209,6 @@ export function parseResolveInfo(
         if (!typeKey) {
             return null;
         }
-        console.log(JSON.stringify({ level: 40, tree, typeKey }));
         const fields = tree[typeKey];
         const fieldKey = firstKey(fields);
         if (!fieldKey) {
