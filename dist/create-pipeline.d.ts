@@ -1,2 +1,3 @@
 import { GraphQLResolveInfo } from 'graphql';
-export declare function createPipeline(mainField: string, resolveInfo: GraphQLResolveInfo, context: {}): {}[];
+import { Logger } from 'pino';
+export declare function createPipeline(mainField: string, resolveInfo: GraphQLResolveInfo, context: {}, log?: Logger): {}[];
