@@ -65,7 +65,7 @@ function fillPipeline(
                 pipeline.push(
                     { $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } },
                     {
-                        $project: {
+                        $addFields: {
                             [`${path}${alias}`]: {
                                 $cond: {
                                     if: { $eq: [{}, `$${path}${alias}`] },
