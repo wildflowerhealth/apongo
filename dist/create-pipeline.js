@@ -48,8 +48,8 @@ function fillPipeline(fields, pipeline, context, path = '', log, oneToMany = fal
             if (!oneToMany) {
                 pipeline.push({ $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } }, {
                     $project: {
-                        $cond: {
-                            [`${path}${alias}`]: {
+                        [`${path}${alias}`]: {
+                            $cond: {
                                 if: { $eq: [{}, `$${path}${alias}`] },
                                 then: '$$REMOVE',
                                 else: `$${path}${alias}`,
