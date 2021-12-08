@@ -25,15 +25,8 @@ function fillPipeline(
                 );
             }
             let lookup;
-            const {
-                collection,
-                localField,
-                foreignField,
-                preserveNull,
-                conds,
-                sort,
-                limit,
-            } = apongo.lookup;
+            const { collection, localField, foreignField, preserveNull, conds, sort, limit } =
+                apongo.lookup;
             oneToMany = !!apongo.lookup.oneToMany;
             const simple = !conds && !sort && !limit;
 
@@ -73,12 +66,12 @@ function fillPipeline(
                     { $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } },
                     {
                         $project: {
-                            [`${path}${alias}`]: {
-                                $cond: [
-                                    { $eq: [`$${path}${alias}`, {}] },
-                                    null,
-                                    `$${path}${alias}`,
-                                ],
+                            $cond: {
+                                [`${path}${alias}`]: {
+                                    if: { $eq: [{}, `$${path}${alias}`] },
+                                    then: '$$REMOVE',
+                                    else: `$${path}${alias}`,
+                                },
                             },
                         },
                     },
@@ -153,7 +146,12 @@ function fillPipeline(
     });
 }
 
-export function createPipeline(mainField: string, resolveInfo: GraphQLResolveInfo, context: {}, log?: Logger) {
+export function createPipeline(
+    mainField: string,
+    resolveInfo: GraphQLResolveInfo,
+    context: {},
+    log?: Logger,
+) {
     const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
 
     let { fields } = simplifyParsedResolveInfoFragmentWithType(
