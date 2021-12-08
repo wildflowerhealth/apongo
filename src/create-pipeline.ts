@@ -5,15 +5,15 @@ import { IField } from './models';
 import { Logger } from 'pino';
 import { parseResolveInfo, simplifyParsedResolveInfoFragmentWithType } from './parse-resolve-info';
 
-function fillPipeline(
+async function fillPipeline(
     fields: { [key: string]: IField },
     pipeline: Array<{}>,
-    replaceTokens?: (str: string) => string,
+    replaceTokens?: (str: string) => Promise<string>,
     path = '',
     log?: Logger,
     oneToMany = false,
 ) {
-    Object.keys(fields).forEach(fieldName => {
+    for (const fieldName of Object.keys(fields)) {
         const field = fields[fieldName];
         const { alias, apongo = {} } = field;
 
@@ -46,7 +46,7 @@ function fillPipeline(
                                 $expr: {
                                     $and: [
                                         { $eq: [`$${foreignField}`, '$$localField'] },
-                                        ...(conds ? JSON.parse(replaceTokens ? replaceTokens(conds) : conds) : []),
+                                        ...(conds ? JSON.parse(replaceTokens ? await replaceTokens(conds) : conds) : []),
                                     ],
                                 },
                             },
@@ -125,7 +125,7 @@ function fillPipeline(
             //     });
             // }
             const subFields = field.fieldsByTypeName[fieldsByTypeNameKeys[0]];
-            fillPipeline(subFields, pipeline, replaceTokens, `${path}${alias}.`, log, oneToMany);
+            await fillPipeline(subFields, pipeline, replaceTokens, `${path}${alias}.`, log, oneToMany);
             // if (oneToMany) {
             //     pipeline.push({
             //         $group: {},
@@ -143,13 +143,13 @@ function fillPipeline(
         //         },
         //     });
         // }
-    });
+    }
 }
 
-export function createPipeline(
+export async function createPipeline(
     mainField: string,
     resolveInfo: GraphQLResolveInfo,
-    replaceTokens?: (str: string) => string,
+    replaceTokens?: (str: string) => Promise<string>,
     log?: Logger,
 ) {
     const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
@@ -173,7 +173,7 @@ export function createPipeline(
     }
 
     const pipeline = [] as Array<{}>;
-    fillPipeline(fields, pipeline, replaceTokens, undefined, log);
+    await fillPipeline(fields, pipeline, replaceTokens, undefined, log);
     if (log) log.debug({ pipeline, fields }, 'Apongo: createPipeline');
 
     return pipeline;
