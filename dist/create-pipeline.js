@@ -13,7 +13,7 @@ function fillPipeline(fields, pipeline, context, path = '', log, oneToMany = fal
                 throw new apollo_server_core_1.ApolloError(`Apongo: Cannot use lookup on a one-to-many field at: ${path}.${alias}`);
             }
             let lookup;
-            const { collection, localField, foreignField, preserveNull, conds, sort, limit, } = apongo.lookup;
+            const { collection, localField, foreignField, preserveNull, conds, sort, limit } = apongo.lookup;
             oneToMany = !!apongo.lookup.oneToMany;
             const simple = !conds && !sort && !limit;
             if (simple) {
@@ -48,12 +48,12 @@ function fillPipeline(fields, pipeline, context, path = '', log, oneToMany = fal
             if (!oneToMany) {
                 pipeline.push({ $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } }, {
                     $project: {
-                        [`${path}${alias}`]: {
-                            $cond: [
-                                { $eq: [`$${path}${alias}`, {}] },
-                                null,
-                                `$${path}${alias}`,
-                            ],
+                        $cond: {
+                            [`${path}${alias}`]: {
+                                if: { $eq: [{}, `$${path}${alias}`] },
+                                then: '$$REMOVE',
+                                else: `$${path}${alias}`,
+                            },
                         },
                     },
                 });
