@@ -8,7 +8,7 @@ import { parseResolveInfo, simplifyParsedResolveInfoFragmentWithType } from './p
 function fillPipeline(
     fields: { [key: string]: IField },
     pipeline: Array<{}>,
-    context: {},
+    replaceTokens?: (str: string) => string,
     path = '',
     log?: Logger,
     oneToMany = false,
@@ -46,7 +46,7 @@ function fillPipeline(
                                 $expr: {
                                     $and: [
                                         { $eq: [`$${foreignField}`, '$$localField'] },
-                                        ...(conds ? JSON.parse(conds) : []),
+                                        ...(conds ? JSON.parse(replaceTokens ? replaceTokens(conds) : conds) : []),
                                     ],
                                 },
                             },
@@ -125,7 +125,7 @@ function fillPipeline(
             //     });
             // }
             const subFields = field.fieldsByTypeName[fieldsByTypeNameKeys[0]];
-            fillPipeline(subFields, pipeline, context, `${path}${alias}.`, log, oneToMany);
+            fillPipeline(subFields, pipeline, replaceTokens, `${path}${alias}.`, log, oneToMany);
             // if (oneToMany) {
             //     pipeline.push({
             //         $group: {},
@@ -149,7 +149,7 @@ function fillPipeline(
 export function createPipeline(
     mainField: string,
     resolveInfo: GraphQLResolveInfo,
-    context: {},
+    replaceTokens?: (str: string) => string,
     log?: Logger,
 ) {
     const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
@@ -173,7 +173,7 @@ export function createPipeline(
     }
 
     const pipeline = [] as Array<{}>;
-    fillPipeline(fields, pipeline, context, undefined, log);
+    fillPipeline(fields, pipeline, replaceTokens, undefined, log);
     if (log) log.debug({ pipeline, fields }, 'Apongo: createPipeline');
 
     return pipeline;
