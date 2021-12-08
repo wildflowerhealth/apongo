@@ -47,7 +47,7 @@ function fillPipeline(fields, pipeline, context, path = '', log, oneToMany = fal
             pipeline.push({ $lookup: Object.assign(Object.assign({}, lookup), { as: `${path}${alias}` }) });
             if (!oneToMany) {
                 pipeline.push({ $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } }, {
-                    $project: {
+                    $addFields: {
                         [`${path}${alias}`]: {
                             $cond: {
                                 if: { $eq: [{}, `$${path}${alias}`] },
