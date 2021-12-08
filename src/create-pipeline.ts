@@ -66,8 +66,8 @@ function fillPipeline(
                     { $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } },
                     {
                         $project: {
-                            $cond: {
-                                [`${path}${alias}`]: {
+                            [`${path}${alias}`]: {
+                                $cond: {
                                     if: { $eq: [{}, `$${path}${alias}`] },
                                     then: '$$REMOVE',
                                     else: `$${path}${alias}`,
