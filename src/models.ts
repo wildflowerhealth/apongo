@@ -8,6 +8,7 @@ export interface IApongoLookup {
     collection: string;
     localField: string;
     foreignField: string;
+    oneToMany?: boolean;
     preserveNull?: boolean;
     conds?: string;
     sort?: string;
