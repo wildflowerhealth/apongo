@@ -5,10 +5,10 @@ import { IField } from './models';
 import { Logger } from 'pino';
 import { parseResolveInfo, simplifyParsedResolveInfoFragmentWithType } from './parse-resolve-info';
 
-async function fillPipeline(
+async function fillPipeline<TCondArg = any>(
     fields: { [key: string]: IField },
     pipeline: Array<{}>,
-    replaceTokens?: (str: string) => Promise<string>,
+    condArg?: TCondArg,
     path = '',
     log?: Logger,
     oneToMany = false,
@@ -46,7 +46,7 @@ async function fillPipeline(
                                 $expr: {
                                     $and: [
                                         { $eq: [`$${foreignField}`, '$$localField'] },
-                                        ...(conds ? JSON.parse(replaceTokens ? await replaceTokens(conds) : conds) : []),
+                                        ...(conds ? await conds(condArg) : []),
                                     ],
                                 },
                             },
@@ -125,7 +125,7 @@ async function fillPipeline(
             //     });
             // }
             const subFields = field.fieldsByTypeName[fieldsByTypeNameKeys[0]];
-            await fillPipeline(subFields, pipeline, replaceTokens, `${path}${alias}.`, log, oneToMany);
+            await fillPipeline(subFields, pipeline, condArg, `${path}${alias}.`, log, oneToMany);
             // if (oneToMany) {
             //     pipeline.push({
             //         $group: {},
@@ -146,10 +146,10 @@ async function fillPipeline(
     }
 }
 
-export async function createPipeline(
+export async function createPipeline<TCondArg = any>(
     mainField: string,
     resolveInfo: GraphQLResolveInfo,
-    replaceTokens?: (str: string) => Promise<string>,
+    condArg?: TCondArg,
     log?: Logger,
 ) {
     const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
@@ -173,7 +173,7 @@ export async function createPipeline(
     }
 
     const pipeline = [] as Array<{}>;
-    await fillPipeline(fields, pipeline, replaceTokens, undefined, log);
+    await fillPipeline(fields, pipeline, condArg, undefined, log);
     if (log) log.debug({ pipeline, fields }, 'Apongo: createPipeline');
 
     return pipeline;

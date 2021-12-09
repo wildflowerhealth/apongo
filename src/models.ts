@@ -1,16 +1,16 @@
-export interface IApongo {
-    lookup?: IApongoLookup;
+export interface IApongo<TCondArg = any> {
+    lookup?: IApongoLookup<TCondArg>;
     compose?: string[];
     expr?: string;
 }
 
-export interface IApongoLookup {
+export interface IApongoLookup<TCondArg = any> {
     collection: string;
     localField: string;
     foreignField: string;
     oneToMany?: boolean;
     preserveNull?: boolean;
-    conds?: string;
+    conds?: (arg: TCondArg) => object[];
     sort?: string;
     limit?: number;
 }
