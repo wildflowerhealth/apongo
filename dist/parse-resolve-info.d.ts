@@ -14,6 +14,6 @@ export declare function simplifyParsedResolveInfoFragmentWithType(parsedResolveI
     args?: {
         [arg: string]: any;
     } | undefined;
-    apongo?: import("./models").IApongo | undefined;
+    apongo?: import("./models").IApongo<any> | undefined;
     fieldsByTypeName?: ITreeTypes | undefined;
 };

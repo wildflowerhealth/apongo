@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPipeline = void 0;
 const apollo_server_core_1 = require("apollo-server-core");
 const parse_resolve_info_1 = require("./parse-resolve-info");
-function fillPipeline(fields, pipeline, replaceTokens, path = '', log, oneToMany = false) {
+function fillPipeline(fields, pipeline, condArg, path = '', log, oneToMany = false) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const fieldName of Object.keys(fields)) {
             const field = fields[fieldName];
@@ -43,7 +43,7 @@ function fillPipeline(fields, pipeline, replaceTokens, path = '', log, oneToMany
                                     $expr: {
                                         $and: [
                                             { $eq: [`$${foreignField}`, '$$localField'] },
-                                            ...(conds ? JSON.parse(replaceTokens ? yield replaceTokens(conds) : conds) : []),
+                                            ...(conds ? yield conds(condArg) : []),
                                         ],
                                     },
                                 },
@@ -109,7 +109,7 @@ function fillPipeline(fields, pipeline, replaceTokens, path = '', log, oneToMany
                 //     });
                 // }
                 const subFields = field.fieldsByTypeName[fieldsByTypeNameKeys[0]];
-                yield fillPipeline(subFields, pipeline, replaceTokens, `${path}${alias}.`, log, oneToMany);
+                yield fillPipeline(subFields, pipeline, condArg, `${path}${alias}.`, log, oneToMany);
                 // if (oneToMany) {
                 //     pipeline.push({
                 //         $group: {},
@@ -129,7 +129,7 @@ function fillPipeline(fields, pipeline, replaceTokens, path = '', log, oneToMany
         }
     });
 }
-function createPipeline(mainField, resolveInfo, replaceTokens, log) {
+function createPipeline(mainField, resolveInfo, condArg, log) {
     return __awaiter(this, void 0, void 0, function* () {
         const parsedResolveInfoFragment = (0, parse_resolve_info_1.parseResolveInfo)(resolveInfo);
         let { fields } = (0, parse_resolve_info_1.simplifyParsedResolveInfoFragmentWithType)(parsedResolveInfoFragment, resolveInfo.returnType);
@@ -143,7 +143,7 @@ function createPipeline(mainField, resolveInfo, replaceTokens, log) {
             fields = field.fieldsByTypeName[fieldsByTypeNameKeys[0]];
         }
         const pipeline = [];
-        yield fillPipeline(fields, pipeline, replaceTokens, undefined, log);
+        yield fillPipeline(fields, pipeline, condArg, undefined, log);
         if (log)
             log.debug({ pipeline, fields }, 'Apongo: createPipeline');
         return pipeline;

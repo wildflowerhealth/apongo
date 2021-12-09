@@ -1,3 +1,3 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { Logger } from 'pino';
-export declare function createPipeline(mainField: string, resolveInfo: GraphQLResolveInfo, replaceTokens?: (str: string) => Promise<string>, log?: Logger): Promise<{}[]>;
+export declare function createPipeline<TCondArg = any>(mainField: string, resolveInfo: GraphQLResolveInfo, condArg?: TCondArg, log?: Logger): Promise<{}[]>;
