@@ -27,7 +27,7 @@ async function fillPipeline<TCondArg = any>(
             let lookup;
             const { collection, localField, foreignField, preserveNull, conds, sort, limit } =
                 apongo.lookup;
-            oneToMany = !!apongo.lookup.oneToMany;
+            oneToMany = !!apongo.lookup.oneToMany || (limit ?? 0) > 1 || (!!sort && !limit);
             const simple = !conds && !sort && !limit;
 
             if (simple) {
