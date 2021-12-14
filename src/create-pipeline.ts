@@ -4,6 +4,7 @@ import { ITreeNode } from '.';
 import { IField } from './models';
 import { Logger } from 'pino';
 import { parseResolveInfo, simplifyParsedResolveInfoFragmentWithType } from './parse-resolve-info';
+import { createRemoveEmptyObjectStagesForNestedPath } from './stage-creators';
 
 async function fillPipeline<TCondArg = any>(
     fields: { [key: string]: IField },
@@ -61,21 +62,10 @@ async function fillPipeline<TCondArg = any>(
             const preserveNullAndEmptyArrays = preserveNull !== undefined ? preserveNull : true;
 
             pipeline.push({ $lookup: { ...lookup, as: `${path}${alias}` } });
+
             if (!oneToMany) {
-                pipeline.push(
-                    { $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } },
-                    {
-                        $addFields: {
-                            [`${path}${alias}`]: {
-                                $cond: {
-                                    if: { $eq: [{}, `$${path}${alias}`] },
-                                    then: '$$REMOVE',
-                                    else: `$${path}${alias}`,
-                                },
-                            },
-                        },
-                    },
-                );
+                pipeline.push({ $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } });
+                pipeline.push(...createRemoveEmptyObjectStagesForNestedPath(`${path}${alias}`));
             }
         }
 
