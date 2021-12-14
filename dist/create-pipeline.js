@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPipeline = void 0;
 const apollo_server_core_1 = require("apollo-server-core");
 const parse_resolve_info_1 = require("./parse-resolve-info");
+const stage_creators_1 = require("./stage-creators");
 function fillPipeline(fields, pipeline, condArg, path = '', log, oneToMany = false) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const fieldName of Object.keys(fields)) {
@@ -24,7 +25,7 @@ function fillPipeline(fields, pipeline, condArg, path = '', log, oneToMany = fal
                 }
                 let lookup;
                 const { collection, localField, foreignField, preserveNull, conds, sort, limit } = apongo.lookup;
-                oneToMany = !!apongo.lookup.oneToMany;
+                oneToMany = !!apongo.lookup.oneToMany || (limit !== null && limit !== void 0 ? limit : 0) > 1 || (!!sort && !limit);
                 const simple = !conds && !sort && !limit;
                 if (simple) {
                     lookup = {
@@ -56,17 +57,8 @@ function fillPipeline(fields, pipeline, condArg, path = '', log, oneToMany = fal
                 const preserveNullAndEmptyArrays = preserveNull !== undefined ? preserveNull : true;
                 pipeline.push({ $lookup: Object.assign(Object.assign({}, lookup), { as: `${path}${alias}` }) });
                 if (!oneToMany) {
-                    pipeline.push({ $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } }, {
-                        $addFields: {
-                            [`${path}${alias}`]: {
-                                $cond: {
-                                    if: { $eq: [{}, `$${path}${alias}`] },
-                                    then: '$$REMOVE',
-                                    else: `$${path}${alias}`,
-                                },
-                            },
-                        },
-                    });
+                    pipeline.push({ $unwind: { path: `$${path}${alias}`, preserveNullAndEmptyArrays } });
+                    pipeline.push(...(0, stage_creators_1.createRemoveEmptyObjectStagesForNestedPath)(`${path}${alias}`));
                 }
             }
             // // `compose` concatenates the arguments passed in.
